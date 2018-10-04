@@ -4,68 +4,54 @@ import ChatBar from './ChatBar.jsx';
 import Message from './Message.jsx';
 import MessageList from './MessageList.jsx';
 
+const uuidv1 = require('uuid/v1');
+
 class App extends Component {
 	constructor(props) {
     	super(props);
     	// this is the *only* time you should assign directly to state:
     	this.state = {
     		loading: true,
-    		messages: [
-    		{
-    			uid: "001",
-    			type: "incomingMessage",
-			    content: "I won't be impressed with technology until I can download food.",
-			    username: "Anonymous1"
-			},
-		  	{
-		  		uid: "002",
-		    	type: "incomingMessage",
-		    	content: "I wouldn't want to download Kraft Dinner. I'd be scared of cheese packet loss.",
-		    	username: "Anonymous2"
-		  	},
-			{
-				uid: "003",
-			    type: "incomingMessage",
-			    content: "...",
-			    username: "nomnom"
-			},
-		    {
-		    	uid: "004",
-		        type: "incomingNotification",
-		    	content: "Anonymous1 changed their name to nomnom",
-		  	}
-			]
+    		currentUser: {name: ""},
+    		messages: []
     	};
 
-    	this.keyPress = this.keyPress.bind(this);
+    	this.addMessage = this.addMessage.bind(this);
+    	this.addUser = this.addUser.bind(this);
 
   	}
 
   	componentDidMount() {
   	// After 3 seconds, set `loading` to false in the state.
   		console.log("componentDidMount <App />");
+  		this.webSocket = new WebSocket("ws://localhost:3001");
+  		this.webSocket.onopen = function(){
+  			console.log("server connected.");
+  		};
   		setTimeout(() => {
-  			console.log("Simulating incoming message");
-		    // Add a new message to the list of messages in the data store
-		    const newMessage = {uid: 3, username: "Michelle", content: "Hello there!"};
-		    const messages = this.state.messages.concat(newMessage);
-		    // Update the state of the app component.
-		    // Calling setState will trigger a call to render() in App and all child components.
-		    this.setState({loading: false, messages: messages});
-		    console.log(messages);
+		    this.setState({loading: false});
 		}, 3000);
+		this.webSocket.onmessage = (event) => {
+			const tempData = JSON.parse(event.data);
+			const newData = {uid: tempData.uid, username: tempData.username, content: tempData.content};
+			const messages = this.state.messages.concat(newData);
+  			this.setState({messages: messages});
+		};
 
   	}
 
-  	keyPress(e){
+  	addMessage(e){
   		
   		if(e.key == "Enter"){
-  			console.log('value', e.target.value);
-  			const newMessage = {uid: 39, username: "e.target.name", content: e.target.value};
-  			const messages = this.state.messages.concat(newMessage);
-  			this.setState({loading: false, messages: messages});
+  			const newMessage = {uid: uuidv1(), username: this.state.currentUser.name, content: e.target.value};
+  			this.webSocket.send(JSON.stringify(newMessage));
+  			newMessage.value = "";
   		}
 
+    }
+
+    addUser(e){
+		this.setState({currentUser: {name:e.target.value}});
     }
 
 	render() {
@@ -81,7 +67,7 @@ class App extends Component {
 				  			<a href="/" className="navbar-brand">Chatty</a>
 						</nav>
 		      			<MessageList messages={messages}/>
-						<ChatBar userName={messages[0].username} keyPressApp={this.keyPress} />
+						<ChatBar addUserApp={this.addUser} addMessageApp={this.addMessage} />
 					</div>	
 		      	)
 		    }

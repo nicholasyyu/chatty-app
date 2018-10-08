@@ -36,6 +36,9 @@ This boilerplate project includes React ESLint configuration.
 ```
 npm run lint
 ```
+## Final Product
+
+!["screenshot description"](https://github.com/nicholasyyu/chatty-app/blob/master/build/chattyApp.png?raw=true)
 
 ### Dependencies
 

@@ -4,14 +4,21 @@ import Message from './Message.jsx';
 class MessageList extends Component {
 	render() {
 
-		console.log(this.props.messages);
+		//console.log(this.props.messages);
 
 		const listMessages = this.props.messages.map((message) =>
 
 				<Message key={message.uid} message={message} />);
 	
 
-		return (<main className="messages"><ul>{listMessages}</ul></main>);
+		return (
+			<div>
+			<div className="messages">
+			<span className="system">{this.props.notification.notice}</span>
+			<ul>{listMessages}</ul>
+			</div>
+			</div>
+		);
 
 	}
 

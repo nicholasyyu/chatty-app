@@ -47,7 +47,7 @@ body {
   padding: 5px;
 }
 
-.message.system {
+.system {
   font-style: italic;
   padding: 5px 20px;
 }
@@ -89,4 +89,9 @@ body {
   line-height: 60px;
   padding: 0 10px;
   text-decoration: none;
+}
+
+.userNumber {
+  text-align: right;
+  padding-top: 0.7em;
 }
